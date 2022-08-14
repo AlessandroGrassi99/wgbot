@@ -26,6 +26,4 @@ This is a deeply modified version of [immo](https://github.com/nickirk/immo). Re
 2. Run `python wg_bot.py`
 
 ## Tips and troubleshooting
-- You may need to manually edit the `wgbot/settings.py` file and set `ROBOTSTXT_OBEY = False`
-- If at runtime something is wrong with the generation of the `wg_offer.json` file, set `LOG_ENABLED=true` into `wg_bot.py`
 - I suggest you to check the README file of the [original project](https://github.com/nickirk/immo), there might be interesting insights there
