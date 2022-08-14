@@ -1,20 +1,32 @@
-import scrapy
+from typing import List
+from bs4 import BeautifulSoup
+from lxml import etree
+import urllib3
 
-class QuotesSpider(scrapy.Spider):
-    name = "wg-gesucht"
+XPATH_OFFER_URL = '//div[contains(@id, "main_column")]//div[contains(@class, "wgg_card offer_list_item")]//h3[contains(@class, "truncate_title")]//a[contains(@href, "/en/")]/@href'
 
-    def start_requests(self):
-        urls = [
-            'https://www.wg-gesucht.de/en/wg-zimmer-und-1-zimmer-wohnungen-und-wohnungen-und-haeuser-in-Munchen.90.0+1+2+3.1.0.html?user_filter_id=7134295&ad_type=0&offer_filter=1&city_id=90&noDeact=1&dFr=1659045600&dTo=1664920800&rMax=800&sin=1&exc=2&img_only=1&ot=2114%2C2123%2C2124%2C2131%2C2132%2C2133&categories=0%2C1%2C2%2C3&rent_types=0',
-            'https://www.wg-gesucht.de/en/wg-zimmer-und-1-zimmer-wohnungen-und-wohnungen-und-haeuser-in-Garching-b-Munchen.400.0+1+2+3.1.0.html?user_filter_id=7134280&ad_type=0&offer_filter=1&city_id=400&noDeact=1&dFr=1659045600&dTo=1664920800&rMax=800&sin=1&exc=2&img_only=1&categories=0%2C1%2C2%2C3&rent_types=0',
-        ]
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
 
-    def parse(self, response):
-        entries = response.xpath('//div[contains(@id, "main_column")]//div[contains(@class, "wgg_card offer_list_item")]//h3[contains(@class, "truncate_title")]//a[contains(@href, "/en/")]/@href').getall()
-        for i, entry in enumerate(entries):
-            # print("{}: {}".format(i, entry))
-            if not 'airbnb.pvxt.net' in entry:
-                yield { "data-id": entry }
+class FilterSpider():
+    def __init__(self, urls: List[str]):
+        self.urls = urls
+        self.http = urllib3.PoolManager()
 
+    def get_pages_content(self) -> List[str]:
+        pages = []
+
+        for url in self.urls:
+            res = self.http.request('GET', url)
+
+            if res.status == 200:
+                pages.append(res)
+        return pages
+
+    def get_offers(self) -> List[str]:
+        pages = self.get_pages_content()
+
+        urls = []
+        for page in pages:
+            soup = BeautifulSoup(page.data, "html.parser")
+            dom = etree.HTML(str(soup))
+            urls.extend(dom.xpath(XPATH_OFFER_URL))
+        return list(set(urls))

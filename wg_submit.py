@@ -89,6 +89,14 @@ def driver_connect(url):
 
             logger.debug("Opening the browser")
             driver = webdriver.Chrome(chrome_options=options, executable_path='/usr/bin/chromedriver')
+        except (TimeoutException, WebDriverException) as err:
+            if tries + 1 == MAX_TRIES:
+                return None
+            if not check_connection():
+                time.sleep(30)
+            logger.info("Retrying...")
+
+        try:
             driver.get(url)
             return driver
         except (TimeoutException, WebDriverException) as err:
@@ -97,6 +105,8 @@ def driver_connect(url):
             if not check_connection():
                 time.sleep(30)
             logger.info("Retrying...")
+        driver.quit()
+
     return None
 
 
@@ -152,8 +162,9 @@ def try_to_login(driver, config):
     try:
         login_dialog_button = driver.find_element(By.XPATH, XPATH_LOGIN_NAV)
         logger.debug("Login...")
-        login_dialog_button.click()   
+        login_dialog_button.click()
 
+        driver.implicitly_wait(1)
         email = driver.find_element(By.ID, 'login_email_username')
         email.send_keys(config['username'])
         passwd = driver.find_element(By.ID, 'login_password')
@@ -161,6 +172,7 @@ def try_to_login(driver, config):
         # Enabled by default
         # remember_button = driver.find_element(By.ID, 'auto_login')
         # remember_button.click()
+
         login_button = driver.find_element(By.ID, 'login_submit')
         login_button.click()
         # TODO Check that it is logged in correctly without errors
