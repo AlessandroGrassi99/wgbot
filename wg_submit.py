@@ -4,7 +4,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException,
 from selenium.webdriver.common.by import By
 
 from loguru import logger
-from ping3 import ping
+import socket
 import time
 
 
@@ -182,6 +182,15 @@ def try_to_login(driver, config):
 
 
 def check_connection():
-    hostname = "google.com"
-    response = ping(hostname)
-    return response
+    try:
+        hostname = "one.one.one.one"
+        # see if we can resolve the host name -- tells us if there is
+        # a DNS listening
+        host = socket.gethostbyname(hostname)
+        # connect to the host -- tells us if the host is actually reachable
+        s = socket.create_connection((host, 80), 2)
+        s.close()
+        return True
+    
+    except Exception:
+        return False

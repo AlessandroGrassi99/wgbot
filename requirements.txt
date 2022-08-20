@@ -5,3 +5,4 @@ toml==0.10.2
 beautifulsoup4==4.11.1
 urllib3==1.26.11
 lxml==4.9.1
+certifi==2019.11.28
