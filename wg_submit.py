@@ -95,6 +95,7 @@ def driver_connect(url):
             if not check_connection():
                 time.sleep(30)
             logger.info("Retrying...")
+            continue
 
         try:
             driver.get(url)
