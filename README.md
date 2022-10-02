@@ -27,4 +27,5 @@ This is a deeply modified version of [immo](https://github.com/nickirk/immo). Re
 
 ## Tips and troubleshooting
 - Use the filters with the English version of the site, they must be in the format `https://www.wg-gesucht.de/en/`, with `/en/` at the end
+- Currently Selenium and other dependencies have some problems on macOS systems. Unfortunately, these are not problems that depend directly on the script; I recommend using a VM with Ubuntu. 
 - I suggest you to check the README file of the [original project](https://github.com/nickirk/immo), there might be interesting insights there
